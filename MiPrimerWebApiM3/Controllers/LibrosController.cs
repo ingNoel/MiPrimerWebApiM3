@@ -14,10 +14,12 @@ namespace MiPrimerWebApiM3.Controllers
     {
         #region Constructor
         private readonly ApplicationDbContext context;
+        private readonly DbSet<Libro> contextTable;
 
         public LibrosController(ApplicationDbContext context)
         {
             this.context = context;
+            this.contextTable = context.Libros;
         }
         #endregion
 
@@ -25,13 +27,13 @@ namespace MiPrimerWebApiM3.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Libro>> Get()
         {
-            return context.Libros.Include(x => x.Autor).ToList();
+            return contextTable.Include(x => x.Autor).ToList();
         }
 
         [HttpGet("{id}", Name = "ObtenerLibro")]
         public ActionResult<Libro> Get(int id)
         {
-            var entity = context.Libros
+            var entity = contextTable
                 .Include(x => x.Autor)
                 .FirstOrDefault(x => x.Id == id);
 
@@ -46,7 +48,7 @@ namespace MiPrimerWebApiM3.Controllers
         [HttpPost]
         public ActionResult Post([FromBody] Libro entity)
         {
-            context.Libros.Add(entity);
+            contextTable.Add(entity);
             context.SaveChanges();
             return new CreatedAtRouteResult("ObtenerLibro", new { id = entity.Id }, entity);
         }
@@ -57,8 +59,7 @@ namespace MiPrimerWebApiM3.Controllers
         public ActionResult Put(int id, [FromBody] Libro value)
         {
             /*Se valida el Id para asegurarnos de que no se quiera cambiar el valor del id de un recurso*/
-            if (id != value.Id)
-                return BadRequest();
+            if (id != value.Id) return BadRequest();
 
             context.Entry(value).State = EntityState.Modified;
             context.SaveChanges();
@@ -70,12 +71,11 @@ namespace MiPrimerWebApiM3.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Libro> Delete(int id)
         {
-            var entity = context.Libros.FirstOrDefault(x => x.Id == id);
+            var entity = contextTable.FirstOrDefault(x => x.Id == id);
             //if there is not valid entity, return NotFound as an answer
-            if (entity == null)
-                return NotFound();
+            if (entity == null) return NotFound();
 
-            context.Libros.Remove(entity);
+            contextTable.Remove(entity);
             context.SaveChanges();
             return entity;
         }

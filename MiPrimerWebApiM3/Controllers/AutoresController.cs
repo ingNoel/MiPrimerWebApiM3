@@ -12,16 +12,18 @@ namespace MiPrimerWebApiM3.Controllers
     public class AutoresController : ControllerBase
     {
         private readonly ApplicationDbContext context;
+        private readonly DbSet<Autor> contextTable;
 
         public AutoresController(ApplicationDbContext context)
         {
             this.context = context;
+            contextTable = context.Autores;
         }
 
         [HttpGet]
         public ActionResult<IEnumerable<Autor>> Get() 
         {
-            return context.Autores
+            return contextTable
                 .Include(x => x.Libros)
                 .ToList();
         } 
@@ -29,33 +31,32 @@ namespace MiPrimerWebApiM3.Controllers
         [HttpGet("{id}", Name = "ObtenerAutor")]
         public ActionResult<Autor> Get(int id) 
         {
-            var autor = context.Autores
+            var entity = contextTable
                 .Include(x => x.Libros)
                 .FirstOrDefault(x => x.Id == id);
 
-            if (autor == null) return NotFound();
+            if (entity == null) return NotFound();
 
-            return autor;
+            return entity;
         }
         /*
          6)_ Crear un método Post. Recibimos un autor de nuestro cliente para insertarlo en la base de datos, que mandará en el cuerpo de la petición HTTP
         6.1)_Una de las convenciones del HTTPPost es que si un recurso es creado debemos retornar una cabecera location en donde se coloque la información de ese recurso
         */
         [HttpPost]
-        public ActionResult Post([FromBody] Autor autor)
+        public ActionResult Post([FromBody] Autor entity)
         {
-            context.Autores.Add(autor);
+            contextTable.Add(entity);
             context.SaveChanges();
-            return new CreatedAtRouteResult("ObtenerAutor", new { id = autor.Id }, autor);
+            return new CreatedAtRouteResult("ObtenerAutor", new { id = entity.Id }, entity);
         }
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] Autor value)
+        public ActionResult Put(int id, [FromBody] Autor entity)
         {
             /*Se valida el Id para asegurarnos de que no se quiera cambiar el valor del id de un recurso*/
-            if (id != value.Id) 
-                return BadRequest();
+            if (id != entity.Id) return BadRequest();
 
-            context.Entry(value).State = EntityState.Modified;
+            context.Entry(entity).State = EntityState.Modified;
             context.SaveChanges();
             return Ok();//We dont need to return the Entity because client already have it
         }
@@ -63,14 +64,13 @@ namespace MiPrimerWebApiM3.Controllers
         [HttpDelete("{id}")]
         public ActionResult<Autor> Delete(int id)
         {
-            var autor = context.Autores.FirstOrDefault(x => x.Id == id);
+            var entity = contextTable.FirstOrDefault(x => x.Id == id);
             //if there is not valid entity, return NotFound as an answer
-            if(autor == null)
-                return NotFound();
+            if(entity == null) return NotFound();
 
-            context.Autores.Remove(autor);
+            contextTable.Remove(entity);
             context.SaveChanges();
-            return autor;
+            return entity;
         }
 
     }
