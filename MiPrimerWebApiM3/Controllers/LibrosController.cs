@@ -58,9 +58,7 @@ namespace MiPrimerWebApiM3.Controllers
         {
             /*Se valida el Id para asegurarnos de que no se quiera cambiar el valor del id de un recurso*/
             if (id != value.Id)
-            {
                 return BadRequest();
-            }
 
             context.Entry(value).State = EntityState.Modified;
             context.SaveChanges();

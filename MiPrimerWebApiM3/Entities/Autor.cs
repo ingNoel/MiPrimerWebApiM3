@@ -12,6 +12,6 @@ namespace MiPrimerWebApiM3.Entities
         public int Id { get; set; }
         [Required]
         public string Nombre { get; set; }
-        public DbSet<Libro> Libros { get; set; }
+        public List<Libro> Libros { get; set; }
     }
 }

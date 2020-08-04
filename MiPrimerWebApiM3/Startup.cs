@@ -27,8 +27,9 @@ namespace MiPrimerWebApiM3
                 options.UseSqlServer(connectionString));
 
             services.AddControllers()
-                .AddNewtonsoftJson(options => 
-                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+                .AddNewtonsoftJson(options =>
+                options.SerializerSettings.ReferenceLoopHandling
+                = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

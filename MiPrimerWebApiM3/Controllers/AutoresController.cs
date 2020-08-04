@@ -21,7 +21,9 @@ namespace MiPrimerWebApiM3.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Autor>> Get() 
         {
-            return context.Autores.Include(x => x.Libros).ToList();
+            return context.Autores
+                .Include(x => x.Libros)
+                .ToList();
         } 
         
         [HttpGet("{id}", Name = "ObtenerAutor")]
@@ -50,10 +52,8 @@ namespace MiPrimerWebApiM3.Controllers
         public ActionResult Put(int id, [FromBody] Autor value)
         {
             /*Se valida el Id para asegurarnos de que no se quiera cambiar el valor del id de un recurso*/
-            if (id != value.Id)
-            {
+            if (id != value.Id) 
                 return BadRequest();
-            }
 
             context.Entry(value).State = EntityState.Modified;
             context.SaveChanges();
