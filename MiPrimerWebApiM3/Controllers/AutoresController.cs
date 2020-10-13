@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using MiPrimerWebApiM3.Contexts;
 using MiPrimerWebApiM3.Entities;
+using MiPrimerWebApiM3.Services;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -12,22 +14,38 @@ namespace MiPrimerWebApiM3.Controllers
     public class AutoresController : ControllerBase
     {
         private readonly ApplicationDbContext context;
+        private readonly IClaseB claseB;
+        private readonly ILogger<AutoresController> logger;
         private readonly DbSet<Autor> contextTable;
 
-        public AutoresController(ApplicationDbContext context)
+        public AutoresController(ApplicationDbContext context, ClaseB claseB, ILogger<AutoresController> logger)
         {
             this.context = context;
+            this.claseB = claseB;
+            this.logger = logger;
             contextTable = context.Autores;
         }
 
-        [HttpGet]
+        [HttpGet] // get /api/autores
+        [HttpGet("listado")] //get /api/autores/listado
+        [HttpGet("/listado")] //get /listado
         public ActionResult<IEnumerable<Autor>> Get() 
         {
+            logger.LogInformation("Obteniendo los autores");
+            claseB.HacerAlgo();
             return contextTable
                 .Include(x => x.Libros)
                 .ToList();
-        } 
-        
+        }
+        [HttpGet("Primer")]
+        public ActionResult<Autor> GetPrimerAutor()
+        {
+            return contextTable.FirstOrDefault();
+        }
+        //Si se desea un valor por defecto, colocar el signo = 
+        //Si queremos hace un parámetro opcional, se coloca signo de interrogación “?”:
+        // get /api/autores/1/armando/rodriguez
+        //[HttpGet("{id}/{param2=Alejandro}/{param3?}", Name = "ObtenerAutor")]
         [HttpGet("{id}", Name = "ObtenerAutor")]
         public ActionResult<Autor> Get(int id) 
         {
@@ -35,7 +53,11 @@ namespace MiPrimerWebApiM3.Controllers
                 .Include(x => x.Libros)
                 .FirstOrDefault(x => x.Id == id);
 
-            if (entity == null) return NotFound();
+            if (entity == null)
+            {
+                logger.LogInformation($"El autor de Id {id} no ha sido encontrado");
+                return NotFound();
+            }
 
             return entity;
         }

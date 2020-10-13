@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MiPrimerWebApiM3.Contexts;
+using MiPrimerWebApiM3.Services;
 
 namespace MiPrimerWebApiM3
 {
@@ -20,6 +21,7 @@ namespace MiPrimerWebApiM3
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<ClaseB>();
             //Get connectionString
             string connectionString = Configuration.GetConnectionString("DefaultConnectionString");
             //Set dbContext
