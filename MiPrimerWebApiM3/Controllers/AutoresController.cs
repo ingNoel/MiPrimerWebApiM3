@@ -55,7 +55,7 @@ namespace MiPrimerWebApiM3.Controllers
 
             if (entity == null)
             {
-                logger.LogInformation($"El autor de Id {id} no ha sido encontrado");
+                logger.LogWarning($"El autor de Id {id} no ha sido encontrado");
                 return NotFound();
             }
 

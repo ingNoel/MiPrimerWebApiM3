@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +22,11 @@ namespace MiPrimerWebApiM3
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Add conjunto de servicios para guardar información en caché.
+            services.AddResponseCaching();
+            //Add authentication 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
+            
             services.AddTransient<ClaseB>();
             //Get connectionString
             string connectionString = Configuration.GetConnectionString("DefaultConnectionString");
@@ -47,7 +53,8 @@ namespace MiPrimerWebApiM3
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseResponseCaching();//añadir función para caché
+            app.UseAuthentication();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

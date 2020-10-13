@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiPrimerWebApiM3.Contexts;
 using MiPrimerWebApiM3.Entities;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -25,9 +27,13 @@ namespace MiPrimerWebApiM3.Controllers
 
         #region GET
         [HttpGet]
+        [ResponseCache(Duration = 60)]
+        [Authorize]
+        //public ActionResult<string> Get()
         public ActionResult<IEnumerable<Libro>> Get()
         {
             return contextTable.Include(x => x.Autor).ToList();
+            //return DateTime.Now.Second.ToString();
         }
 
         [HttpGet("{id}", Name = "ObtenerLibro")]
