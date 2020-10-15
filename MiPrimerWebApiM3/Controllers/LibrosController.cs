@@ -28,7 +28,7 @@ namespace MiPrimerWebApiM3.Controllers
         #region GET
         [HttpGet]
         [ResponseCache(Duration = 60)]
-        [Authorize]
+        //[Authorize]
         //public ActionResult<string> Get()
         public ActionResult<IEnumerable<Libro>> Get()
         {

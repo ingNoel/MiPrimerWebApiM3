@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiPrimerWebApiM3.Contexts;
 using MiPrimerWebApiM3.Entities;
+using MiPrimerWebApiM3.Helpers;
 using MiPrimerWebApiM3.Services;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +12,7 @@ namespace MiPrimerWebApiM3.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    //[Microsoft.AspNetCore.Authorization.Authorize]
     public class AutoresController : ControllerBase
     {
         private readonly ApplicationDbContext context;
@@ -29,6 +31,7 @@ namespace MiPrimerWebApiM3.Controllers
         [HttpGet] // get /api/autores
         [HttpGet("listado")] //get /api/autores/listado
         [HttpGet("/listado")] //get /listado
+        [ServiceFilter(typeof(MiFiltroDeAccion))]
         public ActionResult<IEnumerable<Autor>> Get() 
         {
             logger.LogInformation("Obteniendo los autores");
