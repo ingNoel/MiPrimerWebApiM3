@@ -42,7 +42,9 @@ namespace MiPrimerWebApiM3
                 .AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling
                 = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-           
+            services.AddMvc(options => options.Filters.Add(new
+            MiFIltroDeExcepcion()));
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

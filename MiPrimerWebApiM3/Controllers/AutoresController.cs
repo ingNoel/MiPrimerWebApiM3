@@ -5,6 +5,7 @@ using MiPrimerWebApiM3.Contexts;
 using MiPrimerWebApiM3.Entities;
 using MiPrimerWebApiM3.Helpers;
 using MiPrimerWebApiM3.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,9 +32,11 @@ namespace MiPrimerWebApiM3.Controllers
         [HttpGet] // get /api/autores
         [HttpGet("listado")] //get /api/autores/listado
         [HttpGet("/listado")] //get /listado
+        //Es necesario incluir ServiceFilter por la inyección de dependencias
         [ServiceFilter(typeof(MiFiltroDeAccion))]
         public ActionResult<IEnumerable<Autor>> Get() 
         {
+            throw new NotImplementedException();
             logger.LogInformation("Obteniendo los autores");
             claseB.HacerAlgo();
             return contextTable
