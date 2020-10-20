@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using MiPrimerWebApiM3.Contexts;
 using MiPrimerWebApiM3.Entities;
 using MiPrimerWebApiM3.Helpers;
+using MiPrimerWebApiM3.Models;
 using MiPrimerWebApiM3.Services;
 using System;
 using System.Collections.Generic;
@@ -20,12 +22,14 @@ namespace MiPrimerWebApiM3.Controllers
         private readonly IClaseB claseB;
         private readonly ILogger<AutoresController> logger;
         private readonly DbSet<Autor> contextTable;
+        private readonly IMapper mapper;
 
-        public AutoresController(ApplicationDbContext context, ClaseB claseB, ILogger<AutoresController> logger)
+        public AutoresController(ApplicationDbContext context, ClaseB claseB, ILogger<AutoresController> logger, IMapper mapper)
         {
             this.context = context;
             this.claseB = claseB;
             this.logger = logger;
+            this.mapper = mapper;
             contextTable = context.Autores;
         }
 
@@ -34,26 +38,29 @@ namespace MiPrimerWebApiM3.Controllers
         [HttpGet("/listado")] //get /listado
         //Es necesario incluir ServiceFilter por la inyección de dependencias
         [ServiceFilter(typeof(MiFiltroDeAccion))]
-        public ActionResult<IEnumerable<Autor>> Get() 
+        public ActionResult<IEnumerable<AutorDTO>> Get() 
         {
-            throw new NotImplementedException();
-            logger.LogInformation("Obteniendo los autores");
-            claseB.HacerAlgo();
-            return contextTable
+            //logger.LogInformation("Obteniendo los autores");
+            //claseB.HacerAlgo();
+            var entity = contextTable
                 .Include(x => x.Libros)
                 .ToList();
+
+            var _return = mapper.Map<List<AutorDTO>>(entity);
+            return _return;
         }
         [HttpGet("Primer")]
-        public ActionResult<Autor> GetPrimerAutor()
+        public ActionResult<AutorDTO> GetPrimerAutor()
         {
-            return contextTable.FirstOrDefault();
+            var entity = contextTable.FirstOrDefault();
+            return mapper.Map<AutorDTO>(entity);
         }
         //Si se desea un valor por defecto, colocar el signo = 
         //Si queremos hace un parámetro opcional, se coloca signo de interrogación “?”:
         // get /api/autores/1/armando/rodriguez
         //[HttpGet("{id}/{param2=Alejandro}/{param3?}", Name = "ObtenerAutor")]
         [HttpGet("{id}", Name = "ObtenerAutor")]
-        public ActionResult<Autor> Get(int id) 
+        public ActionResult<AutorDTO> Get(int id) 
         {
             var entity = contextTable
                 .Include(x => x.Libros)
@@ -65,7 +72,8 @@ namespace MiPrimerWebApiM3.Controllers
                 return NotFound();
             }
 
-            return entity;
+            var _return = mapper.Map<AutorDTO>(entity);
+            return _return;
         }
         /*
          6)_ Crear un método Post. Recibimos un autor de nuestro cliente para insertarlo en la base de datos, que mandará en el cuerpo de la petición HTTP
@@ -90,7 +98,7 @@ namespace MiPrimerWebApiM3.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult<Autor> Delete(int id)
+        public ActionResult<AutorDTO> Delete(int id)
         {
             var entity = contextTable.FirstOrDefault(x => x.Id == id);
             //if there is not valid entity, return NotFound as an answer
@@ -98,7 +106,7 @@ namespace MiPrimerWebApiM3.Controllers
 
             contextTable.Remove(entity);
             context.SaveChanges();
-            return entity;
+            return mapper.Map<AutorDTO>(entity);
         }
 
     }

@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,7 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MiPrimerWebApiM3.Contexts;
+using MiPrimerWebApiM3.Entities;
 using MiPrimerWebApiM3.Helpers;
+using MiPrimerWebApiM3.Models;
 using MiPrimerWebApiM3.Services;
 
 namespace MiPrimerWebApiM3
@@ -23,6 +26,14 @@ namespace MiPrimerWebApiM3
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Add Autommaper to Map Entities
+            services.AddAutoMapper(configuration => 
+            {
+                configuration.CreateMap<Autor, AutorDTO>();
+                configuration.CreateMap<Libro, LibroDTO>();
+            },typeof(Startup));
+
+
             //Add service for MIFiltroAccion filter
             services.AddScoped<MiFiltroDeAccion>();
 
@@ -38,12 +49,15 @@ namespace MiPrimerWebApiM3
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-            services.AddControllers()
-                .AddNewtonsoftJson(options =>
+            services.AddControllers(options =>
+            {
+                options.Filters.Add(new MiFIltroDeExcepcion());
+                // Si hubiese Inyección de dependencias en el filtro
+                //options.Filters.Add(typeof(MiFiltroDeExcepcion)); 
+            }).AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling
                 = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-            services.AddMvc(options => options.Filters.Add(new
-            MiFIltroDeExcepcion()));
+
 
         }
 

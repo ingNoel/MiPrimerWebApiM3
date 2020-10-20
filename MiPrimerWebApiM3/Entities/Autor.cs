@@ -15,6 +15,8 @@ namespace MiPrimerWebApiM3.Entities
         [PrimeraLetraMayuscula]
         [StringLength(10,ErrorMessage ="El campo debe tener {1} caracteres o menos")]
         public string Nombre { get; set; }
+        public string Identificacion { get; set; }
+        public DateTime FechaNacimiento { get; set; }
         //[Range(18,120)]
         //public int Edad { get; set; }
         //[CreditCard]

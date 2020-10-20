@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiPrimerWebApiM3.Contexts;
 using MiPrimerWebApiM3.Entities;
+using MiPrimerWebApiM3.Models;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -16,11 +18,13 @@ namespace MiPrimerWebApiM3.Controllers
     {
         #region Constructor
         private readonly ApplicationDbContext context;
+        private readonly IMapper mapper;
         private readonly DbSet<Libro> contextTable;
 
-        public LibrosController(ApplicationDbContext context)
+        public LibrosController(ApplicationDbContext context, IMapper mapper)
         {
             this.context = context;
+            this.mapper = mapper;
             this.contextTable = context.Libros;
         }
         #endregion
@@ -30,14 +34,14 @@ namespace MiPrimerWebApiM3.Controllers
         [ResponseCache(Duration = 60)]
         //[Authorize]
         //public ActionResult<string> Get()
-        public ActionResult<IEnumerable<Libro>> Get()
+        public ActionResult<IEnumerable<LibroDTO>> Get()
         {
-            return contextTable.Include(x => x.Autor).ToList();
-            //return DateTime.Now.Second.ToString();
+            var entity = contextTable.Include(x => x.Autor).ToList();
+            return mapper.Map<List<LibroDTO>>(entity);
         }
 
         [HttpGet("{id}", Name = "ObtenerLibro")]
-        public ActionResult<Libro> Get(int id)
+        public ActionResult<LibroDTO> Get(int id)
         {
             var entity = contextTable
                 .Include(x => x.Autor)
@@ -45,7 +49,7 @@ namespace MiPrimerWebApiM3.Controllers
 
             if (entity == null) return NotFound();
 
-            return entity;
+            return mapper.Map<LibroDTO>(entity);
         }
 
         #endregion
@@ -75,7 +79,7 @@ namespace MiPrimerWebApiM3.Controllers
 
         #region DELETE
         [HttpDelete("{id}")]
-        public ActionResult<Libro> Delete(int id)
+        public ActionResult<LibroDTO> Delete(int id)
         {
             var entity = contextTable.FirstOrDefault(x => x.Id == id);
             //if there is not valid entity, return NotFound as an answer
@@ -83,7 +87,7 @@ namespace MiPrimerWebApiM3.Controllers
 
             contextTable.Remove(entity);
             context.SaveChanges();
-            return entity;
+            return mapper.Map<LibroDTO>(entity);
         }
         #endregion
     }
