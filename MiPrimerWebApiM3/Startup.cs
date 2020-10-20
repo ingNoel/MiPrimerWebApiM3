@@ -30,7 +30,9 @@ namespace MiPrimerWebApiM3
             services.AddAutoMapper(configuration => 
             {
                 configuration.CreateMap<Autor, AutorDTO>();
+                configuration.CreateMap<AutorPostDTO, Autor>();
                 configuration.CreateMap<Libro, LibroDTO>();
+                configuration.CreateMap<LibroPostDTO, Libro>();
             },typeof(Startup));
 
 
@@ -51,7 +53,7 @@ namespace MiPrimerWebApiM3
 
             services.AddControllers(options =>
             {
-                options.Filters.Add(new MiFIltroDeExcepcion());
+                //options.Filters.Add(new MiFIltroDeExcepcion());
                 // Si hubiese Inyección de dependencias en el filtro
                 //options.Filters.Add(typeof(MiFiltroDeExcepcion)); 
             }).AddNewtonsoftJson(options =>

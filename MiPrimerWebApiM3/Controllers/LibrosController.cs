@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MiPrimerWebApiM3.Controllers
 {
@@ -16,11 +17,13 @@ namespace MiPrimerWebApiM3.Controllers
     [ApiController]
     public class LibrosController : ControllerBase
     {
-        #region Constructor
+        #region Properties
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
-        private readonly DbSet<Libro> contextTable;
+        private readonly DbSet<Libro> contextTable; 
+        #endregion
 
+        #region Constructor
         public LibrosController(ApplicationDbContext context, IMapper mapper)
         {
             this.context = context;
@@ -31,21 +34,21 @@ namespace MiPrimerWebApiM3.Controllers
 
         #region GET
         [HttpGet]
-        [ResponseCache(Duration = 60)]
+        //[ResponseCache(Duration = 60)]
         //[Authorize]
         //public ActionResult<string> Get()
-        public ActionResult<IEnumerable<LibroDTO>> Get()
+        public async Task<ActionResult<IEnumerable<LibroDTO>>> Get()
         {
-            var entity = contextTable.Include(x => x.Autor).ToList();
+            List<Libro> entity = await contextTable.Include(x => x.Autor).ToListAsync();
             return mapper.Map<List<LibroDTO>>(entity);
         }
 
         [HttpGet("{id}", Name = "ObtenerLibro")]
-        public ActionResult<LibroDTO> Get(int id)
+        public async Task<ActionResult<LibroDTO>> Get(int id)
         {
-            var entity = contextTable
+            var entity = await contextTable
                 .Include(x => x.Autor)
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (entity == null) return NotFound();
 
@@ -56,32 +59,34 @@ namespace MiPrimerWebApiM3.Controllers
 
         #region POST
         [HttpPost]
-        public ActionResult Post([FromBody] Libro entity)
+        public async  Task<ActionResult> Post([FromBody] LibroPostDTO entity)
         {
-            contextTable.Add(entity);
-            context.SaveChanges();
-            return new CreatedAtRouteResult("ObtenerLibro", new { id = entity.Id }, entity);
+            Libro libro = mapper.Map<Libro>(entity);
+            context.Add(libro);
+            await context.SaveChangesAsync();
+            LibroDTO libroDTO = mapper.Map<LibroDTO>(libro);
+            return new CreatedAtRouteResult("ObtenerLibro", new { id = libroDTO.Id }, libroDTO);
         }
         #endregion
 
         #region PUT
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] Libro value)
+        public async Task<ActionResult> Put(int id, [FromBody] Libro value)
         {
             /*Se valida el Id para asegurarnos de que no se quiera cambiar el valor del id de un recurso*/
             if (id != value.Id) return BadRequest();
 
             context.Entry(value).State = EntityState.Modified;
-            context.SaveChanges();
+            await context.SaveChangesAsync();
             return Ok();//We dont need to return the Entity because client already have it
         }
         #endregion
 
         #region DELETE
         [HttpDelete("{id}")]
-        public ActionResult<LibroDTO> Delete(int id)
+        public async Task<ActionResult<LibroDTO>> Delete(int id)
         {
-            var entity = contextTable.FirstOrDefault(x => x.Id == id);
+            var entity = await contextTable.FirstOrDefaultAsync(x => x.Id == id);
             //if there is not valid entity, return NotFound as an answer
             if (entity == null) return NotFound();
 
